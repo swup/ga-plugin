@@ -1,7 +1,7 @@
 import Plugin from '@swup/plugin';
 
 export default class GaPlugin extends Plugin {
-    name = "SwupGaPlugin";
+    name = "GaPlugin";
 
     mount() {
         this.swup.on('contentReplaced', event => {
