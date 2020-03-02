@@ -120,6 +120,8 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _plugin = __webpack_require__(2);
@@ -137,18 +139,19 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var GaPlugin = function (_Plugin) {
     _inherits(GaPlugin, _Plugin);
 
-    function GaPlugin() {
-        var _ref;
-
-        var _temp, _this, _ret;
-
+    function GaPlugin(options) {
         _classCallCheck(this, GaPlugin);
 
-        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-            args[_key] = arguments[_key];
-        }
+        var _this = _possibleConstructorReturn(this, (GaPlugin.__proto__ || Object.getPrototypeOf(GaPlugin)).call(this));
 
-        return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = GaPlugin.__proto__ || Object.getPrototypeOf(GaPlugin)).call.apply(_ref, [this].concat(args))), _this), _this.name = "GaPlugin", _temp), _possibleConstructorReturn(_this, _ret);
+        _this.name = "GaPlugin";
+
+        var defaultOptions = {
+            gaMeasurementId: false
+        };
+
+        _this.options = _extends({}, defaultOptions, options);
+        return _this;
     }
 
     _createClass(GaPlugin, [{
@@ -166,6 +169,20 @@ var GaPlugin = function (_Plugin) {
                     window.ga('send', 'pageview');
 
                     _this2.swup.log('GA pageview (url \'' + url + '\').');
+                } else if (typeof gtag === 'function') {
+
+                    var _title = document.title;
+                    var _url = window.location.pathname + window.location.search;
+                    var gaId = _this2.options.gaMeasurementId;
+
+                    if (gaId === false) {
+                        console.warn('please add your GA Measurement Id');
+                    }
+
+                    gtag('config', gaId, {
+                        'page_title': _title,
+                        'page_path': _url
+                    });
                 } else {
                     console.warn('GA is not loaded.');
                 }
