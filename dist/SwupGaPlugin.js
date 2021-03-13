@@ -117,7 +117,7 @@ module.exports = _index2.default; // this is here for webpack to expose SwupPlug
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -137,60 +137,60 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var GaPlugin = function (_Plugin) {
-    _inherits(GaPlugin, _Plugin);
+	_inherits(GaPlugin, _Plugin);
 
-    function GaPlugin(options) {
-        _classCallCheck(this, GaPlugin);
+	function GaPlugin(options) {
+		_classCallCheck(this, GaPlugin);
 
-        var _this = _possibleConstructorReturn(this, (GaPlugin.__proto__ || Object.getPrototypeOf(GaPlugin)).call(this));
+		var _this = _possibleConstructorReturn(this, (GaPlugin.__proto__ || Object.getPrototypeOf(GaPlugin)).call(this));
 
-        _this.name = "GaPlugin";
+		_this.name = 'GaPlugin';
 
-        var defaultOptions = {
-            gaMeasurementId: false
-        };
+		var defaultOptions = {
+			gaMeasurementId: null
+		};
 
-        _this.options = _extends({}, defaultOptions, options);
-        return _this;
-    }
+		_this.options = _extends({}, defaultOptions, options);
+		return _this;
+	}
 
-    _createClass(GaPlugin, [{
-        key: 'mount',
-        value: function mount() {
-            var _this2 = this;
+	_createClass(GaPlugin, [{
+		key: 'mount',
+		value: function mount() {
+			var _this2 = this;
 
-            this.swup.on('contentReplaced', function (event) {
-                if (typeof window.ga === 'function') {
-                    var title = document.title;
-                    var url = window.location.pathname + window.location.search;
+			this.swup.on('contentReplaced', function (event) {
+				if (typeof gtag === 'function') {
+					var title = document.title;
+					var url = window.location.pathname + window.location.search;
+					var gaId = _this2.options.gaMeasurementId;
 
-                    window.ga('set', 'title', title);
-                    window.ga('set', 'page', url);
-                    window.ga('send', 'pageview');
+					if (!gaId) {
+						throw new Error('gaMeasurementId option is required for gtag.');
+					}
 
-                    _this2.swup.log('GA pageview (url \'' + url + '\').');
-                } else if (typeof gtag === 'function') {
+					window.gtag('config', gaId, {
+						page_title: title,
+						page_path: url
+					});
+					_this2.swup.log('GTAG pageview (url \'' + url + '\').');
+				} else if (typeof window.ga === 'function') {
+					var _title = document.title;
+					var _url = window.location.pathname + window.location.search;
 
-                    var _title = document.title;
-                    var _url = window.location.pathname + window.location.search;
-                    var gaId = _this2.options.gaMeasurementId;
+					window.ga('set', 'title', _title);
+					window.ga('set', 'page', _url);
+					window.ga('send', 'pageview');
 
-                    if (gaId === false) {
-                        console.warn('please add your GA Measurement Id');
-                    }
+					_this2.swup.log('GA pageview (url \'' + _url + '\').');
+				} else {
+					console.warn("window.gtag and window.ga don't exists.");
+				}
+			});
+		}
+	}]);
 
-                    gtag('config', gaId, {
-                        'page_title': _title,
-                        'page_path': _url
-                    });
-                } else {
-                    console.warn('GA is not loaded.');
-                }
-            });
-        }
-    }]);
-
-    return GaPlugin;
+	return GaPlugin;
 }(_plugin2.default);
 
 exports.default = GaPlugin;
