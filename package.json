@@ -1,6 +1,6 @@
 {
   "name": "@swup/ga-plugin",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Swup GA plugin.",
   "main": "lib/index.js",
   "scripts": {
@@ -27,8 +27,8 @@
     "babel-preset-stage-0": "^6.24.1",
     "lodash": "^4.17.11",
     "prettier": "1.17.0",
-    "webpack": "^4.20.2",
-    "webpack-cli": "^3.1.1"
+    "webpack": "^4.41.6",
+    "webpack-cli": "^3.3.11"
   },
   "dependencies": {
     "@swup/plugin": "^1.0.0"

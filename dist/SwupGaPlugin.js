@@ -117,8 +117,10 @@ module.exports = _index2.default; // this is here for webpack to expose SwupPlug
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -135,45 +137,60 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var GaPlugin = function (_Plugin) {
-    _inherits(GaPlugin, _Plugin);
+	_inherits(GaPlugin, _Plugin);
 
-    function GaPlugin() {
-        var _ref;
+	function GaPlugin(options) {
+		_classCallCheck(this, GaPlugin);
 
-        var _temp, _this, _ret;
+		var _this = _possibleConstructorReturn(this, (GaPlugin.__proto__ || Object.getPrototypeOf(GaPlugin)).call(this));
 
-        _classCallCheck(this, GaPlugin);
+		_this.name = 'GaPlugin';
 
-        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-            args[_key] = arguments[_key];
-        }
+		var defaultOptions = {
+			gaMeasurementId: null
+		};
 
-        return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = GaPlugin.__proto__ || Object.getPrototypeOf(GaPlugin)).call.apply(_ref, [this].concat(args))), _this), _this.name = "GaPlugin", _temp), _possibleConstructorReturn(_this, _ret);
-    }
+		_this.options = _extends({}, defaultOptions, options);
+		return _this;
+	}
 
-    _createClass(GaPlugin, [{
-        key: 'mount',
-        value: function mount() {
-            var _this2 = this;
+	_createClass(GaPlugin, [{
+		key: 'mount',
+		value: function mount() {
+			var _this2 = this;
 
-            this.swup.on('contentReplaced', function (event) {
-                if (typeof window.ga === 'function') {
-                    var title = document.title;
-                    var url = window.location.pathname + window.location.search;
+			this.swup.on('contentReplaced', function (event) {
+				if (typeof gtag === 'function') {
+					var title = document.title;
+					var url = window.location.pathname + window.location.search;
+					var gaId = _this2.options.gaMeasurementId;
 
-                    window.ga('set', 'title', title);
-                    window.ga('set', 'page', url);
-                    window.ga('send', 'pageview');
+					if (!gaId) {
+						throw new Error('gaMeasurementId option is required for gtag.');
+					}
 
-                    _this2.swup.log('GA pageview (url \'' + url + '\').');
-                } else {
-                    console.warn('GA is not loaded.');
-                }
-            });
-        }
-    }]);
+					window.gtag('config', gaId, {
+						page_title: title,
+						page_path: url
+					});
+					_this2.swup.log('GTAG pageview (url \'' + url + '\').');
+				} else if (typeof window.ga === 'function') {
+					var _title = document.title;
+					var _url = window.location.pathname + window.location.search;
 
-    return GaPlugin;
+					window.ga('set', 'title', _title);
+					window.ga('set', 'page', _url);
+					window.ga('send', 'pageview');
+
+					_this2.swup.log('GA pageview (url \'' + _url + '\').');
+				} else {
+					console.warn("window.gtag and window.ga don't exists.");
+				}
+			});
+		}
+	}]);
+
+	return GaPlugin;
 }(_plugin2.default);
 
 exports.default = GaPlugin;
