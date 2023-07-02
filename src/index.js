@@ -1,7 +1,7 @@
 import Plugin from '@swup/plugin';
 
-export default class GaPlugin extends Plugin {
-	name = 'GaPlugin';
+export default class SwupGaPlugin extends Plugin {
+	name = 'SwupGaPlugin';
 
 	constructor(options) {
 		super();
