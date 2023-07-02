@@ -1,8 +1,8 @@
 {
   "name": "@swup/ga-plugin",
   "version": "1.1.0",
-  "description": "Swup GA plugin.",
   "main": "lib/index.js",
+  "description": "A swup plugin for integrating Google Analytics",
   "scripts": {
     "compile": "babel --presets es2015,stage-0 -d lib/ src/",
     "build": "webpack-cli",
