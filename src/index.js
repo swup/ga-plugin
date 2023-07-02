@@ -3,46 +3,56 @@ import Plugin from '@swup/plugin';
 export default class SwupGaPlugin extends Plugin {
 	name = 'SwupGaPlugin';
 
-	constructor(options) {
-		super();
-		const defaultOptions = {
-			gaMeasurementId: null
-		};
+	requires = { swup: '>=4' };
 
-		this.options = {
-			...defaultOptions,
-			...options
-		};
+	defaults = {
+		gaMeasurementId: null
+	};
+
+	constructor(options = {}) {
+		super();
+		this.options = { ...this.defaults, ...options };
 	}
 
 	mount() {
-		this.swup.on('contentReplaced', (event) => {
-			if (typeof gtag === 'function') {
-				const title = document.title;
-				const url = window.location.pathname + window.location.search;
-				const gaId = this.options.gaMeasurementId;
+		this.swup.hooks.on('pageView', this.trackPageView);
+	}
 
-				if (!gaId) {
-					throw new Error('gaMeasurementId option is required for gtag.');
-				}
+	unmount() {
+		this.swup.hooks.off('pageView', this.trackPageView);
+	}
 
-				window.gtag('config', gaId, {
-					page_title: title,
-					page_path: url
-				});
-				this.swup.log(`GTAG pageview (url '${url}').`);
-			} else if (typeof window.ga === 'function') {
-				const title = document.title;
-				const url = window.location.pathname + window.location.search;
+	trackPageView = () => {
+		const title = document.title;
+		const url = window.location.pathname + window.location.search;
 
-				window.ga('set', 'title', title);
-				window.ga('set', 'page', url);
-				window.ga('send', 'pageview');
+		if (typeof window.gtag === 'function') {
+			this.trackPageViewInGtag({ title, url });
+			this.swup.log(`GA page view: ${url} (gtag.js)`);
+		} else if (typeof window.ga === 'function') {
+			this.trackPageViewInGa({ title, url });
+			this.swup.log(`GA page view: ${url} (analytics.js)`);
+		} else {
+			console.warn('Neither window.gtag nor window.ga are present on the page');
+		}
+	}
 
-				this.swup.log(`GA pageview (url '${url}').`);
-			} else {
-				console.warn("window.gtag and window.ga don't exists.");
-			}
+	trackPageViewInGtag = ({ title, url }) => {
+		const { gaMeasurementId } = this.options;
+		if (!gaMeasurementId) {
+			console.error('The gaMeasurementId option is required for gtag.js');
+			return;
+		}
+
+		window.gtag('config', gaMeasurementId, {
+			page_title: title,
+			page_path: url
 		});
+	}
+
+	trackPageViewInGa = ({ title, url }) => {
+		window.ga('set', 'title', title);
+		window.ga('set', 'page', url);
+		window.ga('send', 'pageview');
 	}
 }
