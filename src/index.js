@@ -15,11 +15,11 @@ export default class SwupGaPlugin extends Plugin {
 	}
 
 	mount() {
-		this.swup.hooks.on('pageView', this.trackPageView);
+		this.swup.hooks.on('replaceContent', this.trackPageView);
 	}
 
 	unmount() {
-		this.swup.hooks.off('pageView', this.trackPageView);
+		this.swup.hooks.off('replaceContent', this.trackPageView);
 	}
 
 	trackPageView = () => {
