@@ -1,41 +1,42 @@
-# Swup GA plugin
-Google Analytics plugin triggers pageview event on `contentReplaced` (on each page change). 
-Note that this event is not triggered at the first load, so the first page view must be triggered elsewhere. 
-However, page view event is by default triggered in [Javascripts tracking snippet](https://developers.google.com/analytics/devguides/collection/analyticsjs/#the_javascript_tracking_snippet) used for embedding GA. 
-Simplified code run by this plugin on `contentReplaced` event:
+# Swup Google Analytics Plugin
 
-```javascript
-// in case GTAG script is used on page
+A [swup](https://swup.js.org) plugin for integrating Google Analytics.
+
+- Trigger pageview events after each page change
+- This event is not triggered on intial load, so the first page view must be triggered elsewhere
+- However, the page view event is by default triggered in the [Javascripts tracking snippet](https://developers.google.com/analytics/devguides/collection/analyticsjs/#the_javascript_tracking_snippet) used for embedding Google Analytics
+
+Simplified code run by this plugin on the `pageView` hook:
+
+```js
+// On sites using gtag.js
 window.gtag('config', GA_MEASUREMENT_ID, {
-    page_title: title,
-    page_path: url
+  page_title: title,
+  page_path: url
 });
 
-// in case GA script is used on page
+// On sites using analytics.js
 window.ga('set', 'title', document.title);
 window.ga('set', 'page', window.location.pathname + window.location.search);
 window.ga('send', 'pageview');
 ```
 
-**Note:** It has been reported that the plugin stopped working in some cases. It probably depends on the method used to load GA as well. If you encounter a problem, consider switching to [Gtag plugin](https://github.com/joshuaHallee/swup-gtag-plugin).
+## Installation
 
-## Instalation
-This plugin can be installed with npm
+Install the plugin from npm and import it into your bundle.
 
 ```bash
 npm install @swup/ga-plugin
 ```
 
-and included with import
-
-```shell
+```js
 import SwupGaPlugin from '@swup/ga-plugin';
 ```
 
-or included from the dist folder
+Or include the minified production file from a CDN:
 
 ```html
-<script src="./dist/SwupGaPlugin.js"></script>
+<script src="https://unpkg.com/@swup/ga-plugin@2"></script>
 ```
 
 ## Usage
@@ -51,16 +52,19 @@ const swup = new Swup({
 ## Options
 
 ### gaMeasurementId
-This option is only required for the case where GA is used through GTAG, eg. it's loaded with something like this.
+
+This option is only required on sites using gtag.js, usually loaded like this:
+
 ```html
 <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
 ```
-The `window.gtag` requires this ID for each page trigger, so it needs to be passed into an instance of this plugin.
+
+The `window.gtag` function the measurement ID to trigger page views.
 
 ```javascript
 const swup = new Swup({
-  plugins: [new SwupGaPlugin({
-      gaMeasurementId: GA_MEASUREMENT_ID,
-  })],
+  plugins: [
+    new SwupGaPlugin({ gaMeasurementId: GA_MEASUREMENT_ID })
+  ]
 });
 ```
