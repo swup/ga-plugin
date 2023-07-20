@@ -15,14 +15,10 @@ export default class SwupGaPlugin extends Plugin {
 	}
 
 	mount() {
-		this.swup.hooks.on('page:view', this.trackPageView);
+		this.on('page:view', this.trackPageView);
 	}
 
-	unmount() {
-		this.swup.hooks.off('page:view', this.trackPageView);
-	}
-
-	trackPageView = () => {
+	trackPageView() {
 		const title = document.title;
 		const url = window.location.pathname + window.location.search;
 
@@ -37,7 +33,7 @@ export default class SwupGaPlugin extends Plugin {
 		}
 	}
 
-	trackPageViewInGtag = ({ title, url }) => {
+	trackPageViewInGtag({ title, url }) {
 		const { gaMeasurementId } = this.options;
 		if (!gaMeasurementId) {
 			console.error('The gaMeasurementId option is required for gtag.js');
@@ -50,7 +46,7 @@ export default class SwupGaPlugin extends Plugin {
 		});
 	}
 
-	trackPageViewInGa = ({ title, url }) => {
+	trackPageViewInGa({ title, url }) {
 		window.ga('set', 'title', title);
 		window.ga('set', 'page', url);
 		window.ga('send', 'pageview');
