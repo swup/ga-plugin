@@ -6,7 +6,7 @@ A [swup](https://swup.js.org) plugin for integrating Google Analytics.
 - This event is not triggered on intial load, so the first page view must be triggered elsewhere
 - However, the page view event is by default triggered in the [Javascripts tracking snippet](https://developers.google.com/analytics/devguides/collection/analyticsjs/#the_javascript_tracking_snippet) used for embedding Google Analytics
 
-Simplified code run by this plugin on the `replaceContent` hook:
+Simplified code run by this plugin on the `page:view` hook:
 
 ```js
 // On sites using gtag.js
