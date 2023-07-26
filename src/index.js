@@ -1,48 +1,54 @@
 import Plugin from '@swup/plugin';
 
-export default class GaPlugin extends Plugin {
-	name = 'GaPlugin';
+export default class SwupGaPlugin extends Plugin {
+	name = 'SwupGaPlugin';
 
-	constructor(options) {
+	requires = { swup: '>=4' };
+
+	defaults = {
+		gaMeasurementId: null
+	};
+
+	constructor(options = {}) {
 		super();
-		const defaultOptions = {
-			gaMeasurementId: null
-		};
-
-		this.options = {
-			...defaultOptions,
-			...options
-		};
+		this.options = { ...this.defaults, ...options };
 	}
 
 	mount() {
-		this.swup.on('contentReplaced', (event) => {
-			if (typeof gtag === 'function') {
-				const title = document.title;
-				const url = window.location.pathname + window.location.search;
-				const gaId = this.options.gaMeasurementId;
+		this.on('page:view', this.trackPageView);
+	}
 
-				if (!gaId) {
-					throw new Error('gaMeasurementId option is required for gtag.');
-				}
+	trackPageView() {
+		const title = document.title;
+		const url = window.location.pathname + window.location.search;
 
-				window.gtag('config', gaId, {
-					page_title: title,
-					page_path: url
-				});
-				this.swup.log(`GTAG pageview (url '${url}').`);
-			} else if (typeof window.ga === 'function') {
-				const title = document.title;
-				const url = window.location.pathname + window.location.search;
+		if (typeof window.gtag === 'function') {
+			this.trackPageViewInGtag({ title, url });
+			this.swup.log(`GA page view: ${url} (gtag.js)`);
+		} else if (typeof window.ga === 'function') {
+			this.trackPageViewInGa({ title, url });
+			this.swup.log(`GA page view: ${url} (analytics.js)`);
+		} else {
+			console.warn('Neither window.gtag nor window.ga are present on the page');
+		}
+	}
 
-				window.ga('set', 'title', title);
-				window.ga('set', 'page', url);
-				window.ga('send', 'pageview');
+	trackPageViewInGtag({ title, url }) {
+		const { gaMeasurementId } = this.options;
+		if (!gaMeasurementId) {
+			console.error('The gaMeasurementId option is required for gtag.js');
+			return;
+		}
 
-				this.swup.log(`GA pageview (url '${url}').`);
-			} else {
-				console.warn("window.gtag and window.ga don't exists.");
-			}
+		window.gtag('config', gaMeasurementId, {
+			page_title: title,
+			page_path: url
 		});
+	}
+
+	trackPageViewInGa({ title, url }) {
+		window.ga('set', 'title', title);
+		window.ga('set', 'page', url);
+		window.ga('send', 'pageview');
 	}
 }
